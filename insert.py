@@ -21,7 +21,7 @@ except ImportError:
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/calendar-python-quickstart.json
 SCOPES = 'https://www.googleapis.com/auth/calendar'
-CLIENT_SECRET_FILE = 'client_secret.json'
+CLIENT_SECRET_FILE = 'client_secret_165964366033-k8fv1glia0lfsqn120k6h32u26cofcba.apps.googleusercontent.com.json'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
 
@@ -39,7 +39,7 @@ def get_credentials():
     if not os.path.exists(credential_dir):
         os.makedirs(credential_dir)
     credential_path = os.path.join(credential_dir,
-                                   'calendar-python-insert1.json')
+                                   'calendar-python-insert.json')
 
     store = Storage(credential_path)
     credentials = store.get()
@@ -81,7 +81,7 @@ def main():
 
     GMT_OFF = '08:00'
     EVENT = {
-        'summary':'dinner with amy',
+        'summary':'dinner with yy',
         'start' : {'dateTime': '2017-12-31T19:00:00%s' % GMT_OFF},
         'end' : {'dateTime': '2017-12-31T20:00:00%s' % GMT_OFF},
         'attendees': [

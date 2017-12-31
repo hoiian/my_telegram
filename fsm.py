@@ -25,6 +25,7 @@ SCOPES = 'https://www.googleapis.com/auth/calendar'
 CLIENT_SECRET_FILE = 'client_secret.json'
 APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 
+num = 3
 
 def get_credentials():
     """Gets valid user credentials from storage.
@@ -54,7 +55,7 @@ def get_credentials():
         print('Storing credentials to ' + credential_path)
     return credentials
 
-def check():
+def check(num):
     """Shows basic usage of the Google Calendar API.
 
     Creates a Google Calendar API service object and outputs a list of the next
@@ -67,16 +68,25 @@ def check():
 
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
     print('Getting the upcoming 10 events')
+    x = '接下來的' + num + '個活動：\n'
+
     eventsResult = service.events().list(
-        calendarId='primary', timeMin=now, maxResults=10, singleEvents=True,
+        calendarId='primary', timeMin=now, maxResults=num, singleEvents=True,
         orderBy='startTime').execute()
     events = eventsResult.get('items', [])
 
     if not events:
         print('No upcoming events found.')
     for event in events:
-        start = event['start'].get('dateTime', event['start'].get('date'))
+        # start = event['start'].get('dateTime', event['start'].get('date'))
+        start = event['start'].get('dateTime')
+        month = start[5:7]
+        day = start[8:10]
         print(start, event['summary'])
+        x += (month + '月'+ day + '日: ' + event['summary'] + "\n")
+        print(x)
+    
+    return x
 
 class TocMachine(GraphMachine):
     def __init__(self, **machine_configs):
@@ -97,6 +107,12 @@ class TocMachine(GraphMachine):
         text = update.message.text
         return text == 'A go to C'
 
+    def b_to_d(self, update):
+        text = update.message.text
+        global num
+        num = text
+        return num.isdigit()
+    
     def on_enter_state1(self, update):
         update.message.reply_text("state A here")
         update.message.reply_photo(open('test.gif', 'rb'))
@@ -106,8 +122,9 @@ class TocMachine(GraphMachine):
         print('Leaving state1')
 
     def on_enter_state2(self, update):
-        update.message.reply_text("state B here")
-        check()
+        update.message.reply_text("想查接下來幾個活動？")
+        # update.message.reply_text(check())
+        # check()
         # self.go_back(update)
 
     def on_exit_state2(self, update):
@@ -115,3 +132,9 @@ class TocMachine(GraphMachine):
 
     def on_enter_state3(self, update):
         update.message.reply_text("state C here")
+
+    def on_enter_state4(self, update):
+        global num
+        update.message.reply_text("state D here")
+        update.message.reply_text(check(num))
+        # update.message.reply_text(num)
