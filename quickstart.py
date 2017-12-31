@@ -1,6 +1,4 @@
 from __future__ import print_function
-from transitions.extensions import GraphMachine
-
 import httplib2
 import os
 import sys
@@ -54,7 +52,7 @@ def get_credentials():
         print('Storing credentials to ' + credential_path)
     return credentials
 
-def check():
+def main():
     """Shows basic usage of the Google Calendar API.
 
     Creates a Google Calendar API service object and outputs a list of the next
@@ -78,40 +76,6 @@ def check():
         start = event['start'].get('dateTime', event['start'].get('date'))
         print(start, event['summary'])
 
-class TocMachine(GraphMachine):
-    def __init__(self, **machine_configs):
-        self.machine = GraphMachine(
-            model = self,
-            **machine_configs
-        )
-
-    def to_a(self, update):
-        text = update.message.text
-        return text == '加行程'
-
-    def to_b(self, update):
-        text = update.message.text
-        return text == '查行程'
-
-    def a_to_c(self, update):
-        text = update.message.text
-        return text == 'A go to C'
-
-    def on_enter_state1(self, update):
-        update.message.reply_text("state A here")
-        update.message.reply_photo(open('test.gif', 'rb'))
-        # self.go_back(update)
-
-    def on_exit_state1(self, update):
-        print('Leaving state1')
-
-    def on_enter_state2(self, update):
-        update.message.reply_text("state B here")
-        check()
-        # self.go_back(update)
-
-    def on_exit_state2(self, update):
-        print('Leaving state2')
-
-    def on_enter_state3(self, update):
-        update.message.reply_text("state C here")
+    
+if __name__ == '__main__':
+    main()
