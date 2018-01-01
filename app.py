@@ -19,7 +19,9 @@ machine = TocMachine(
         'state1',
         'state2',
         'state3',
-        'state4'
+        'state4',
+        'state5'
+        # 'state6'
     ],
     transitions=[
         {
@@ -27,7 +29,8 @@ machine = TocMachine(
             'source': [
                 'user',
                 'state2',
-                'state4'
+                'state4',
+                'state5'
             ],
             'dest': 'state1',
             'conditions': 'to_a'
@@ -38,11 +41,23 @@ machine = TocMachine(
                 'user',
                 'state1',
                 'state3',
-                'state4'
+                'state4',
+                'state5'
             ],
             'dest': 'state2',
             'conditions': 'to_b'
         },
+        # {
+        #     'trigger': 'advance',
+        #     'source': [
+        #         'user',
+        #         'state2',
+        #         'state4',
+        #         'state5'
+        #     ],
+        #     'dest': 'state6',
+        #     'conditions': 'to_f'
+        # },
         {
             'trigger': 'go_back',
             'source': [
@@ -56,6 +71,12 @@ machine = TocMachine(
             'source': 'state1',
             'dest': 'state3',
             'conditions': 'a_to_c'
+        },
+        {
+            'trigger':'advance',
+            'source': 'state3',
+            'dest': 'state5',
+            'conditions': 'c_to_e'
         },
         {
             'trigger':'advance',

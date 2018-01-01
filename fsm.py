@@ -28,14 +28,6 @@ APPLICATION_NAME = 'Google Calendar API Python Quickstart'
 num = 3
 
 def get_credentials():
-    """Gets valid user credentials from storage.
-
-    If nothing has been stored, or if the stored credentials are invalid,
-    the OAuth2 flow is completed to obtain the new credentials.
-
-    Returns:
-        Credentials, the obtained credential.
-    """
     home_dir = os.path.expanduser('~')
     credential_dir = os.path.join(home_dir, '.credentials')
     if not os.path.exists(credential_dir):
@@ -56,14 +48,7 @@ def get_credentials():
     return credentials
 
 def get_credentials_insert():
-    """Gets valid user credentials from storage.
 
-    If nothing has been stored, or if the stored credentials are invalid,
-    the OAuth2 flow is completed to obtain the new credentials.
-
-    Returns:
-        Credentials, the obtained credential.
-    """
     home_dir = os.path.expanduser('~')
     credential_dir = os.path.join(home_dir, '.credentials')
     if not os.path.exists(credential_dir):
@@ -84,11 +69,6 @@ def get_credentials_insert():
     return credentials
 
 def check(num):
-    """Shows basic usage of the Google Calendar API.
-
-    Creates a Google Calendar API service object and outputs a list of the next
-    10 events on the user's calendar.
-    """
     credentials = get_credentials()
     http = credentials.authorize(httplib2.Http())
     service = discovery.build('calendar', 'v3', http=http)
@@ -110,11 +90,32 @@ def check(num):
         start = event['start'].get('dateTime')
         month = start[5:7]
         day = start[8:10]
+        # eventId = event.get('id')
         print(start, event['summary'])
         x += (month + '月'+ day + '日: ' + event['summary'] + "\n")
         print(x)
     
     return x
+
+def delete(name):
+    credentials = get_credentials_insert()
+    http = credentials.authorize(httplib2.Http())
+    service = discovery.build('calendar', 'v3', http=http)
+
+    now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
+    eventsResult = service.events().list(
+        calendarId='primary', timeMin=now, maxResults=10, singleEvents=True,
+        orderBy='startTime').execute()
+    events = eventsResult.get('items', [])
+
+    if not events:
+        print('No upcoming events found.')
+    for event in events:
+        if(name == event['summary']):
+            eventId = event.get('id')
+            d = service.events().delete(calendarId='primary', eventId='eventId').execute()
+            if(d):
+                return True
 
 class TocMachine(GraphMachine):
     def __init__(self, **machine_configs):
@@ -131,9 +132,24 @@ class TocMachine(GraphMachine):
         text = update.message.text
         return text == '查行程'
 
+    def to_f(self, update):
+        text = update.message.text
+        return text == 'delete'
+
     def a_to_c(self, update):
         text = update.message.text
-        return text == 'dinner'
+        global the_date
+        the_date = text
+        return True
+        # datetime.strptime(the_date, "%Y-%m-%d")
+        # else:
+        #     update.message.reply_text("請按照以下格式：2018-01-01")
+
+    def c_to_e(self, update):
+        text = update.message.text
+        global title
+        title = text
+        return True
 
     def b_to_d(self, update):
         text = update.message.text
@@ -142,7 +158,7 @@ class TocMachine(GraphMachine):
         return num.isdigit()
     
     def on_enter_state1(self, update):
-        update.message.reply_text("state A here")
+        update.message.reply_text("什麼時候呢？(yyyy-mm-dd)")
         update.message.reply_photo(open('test.gif', 'rb'))
         # self.go_back(update)
 
@@ -159,29 +175,33 @@ class TocMachine(GraphMachine):
         print('Leaving state2')
 
     def on_enter_state3(self, update):
-        update.message.reply_text("state C here")
+        global the_date
+        update.message.reply_text(the_date + "你要幹嘛呢？")
+        # update.message.reply_text(the_date)
+
+    def on_enter_state5(self, update):
+        global title
+        update.message.reply_text("state5 here")
+
         credentials = get_credentials_insert()
         http = credentials.authorize(httplib2.Http())
         service = discovery.build('calendar', 'v3', http=http)
-
         # GMT_OFF = '08:00'
         EVENT = {
-            'summary':'哭QQ',
+            'summary':title,
             'start': {
-                'date': '2018-01-03'
+                'dateTime': the_date + 'T09:00:00+08:00'
             },
             'end': {
-                'date': '2018-01-03'
-            },
-            'attendees': [
-                {'email': 'hoiian96@gmail.com'}
-            ]
+                'dateTime': the_date + 'T10:00:00+08:00'
+            }
         }
 
         e = service.events().insert(calendarId='primary', body=EVENT).execute()
 
         if(e):
-            update.message.reply_text("updated!")
+            update.message.reply_text("已加入!")
+
 
     def on_enter_state4(self, update):
         global num
@@ -190,5 +210,7 @@ class TocMachine(GraphMachine):
             update.message.reply_text(check(num))
         else:
             update.message.reply_text("sth wrong.")
-        
-        # update.message.reply_text(num)
+
+    # def on_enter_state6(self, update):
+    #     update.message.reply_text("state F here")
+    #     delete('睡覺')
