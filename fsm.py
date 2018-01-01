@@ -55,6 +55,34 @@ def get_credentials():
         print('Storing credentials to ' + credential_path)
     return credentials
 
+def get_credentials_insert():
+    """Gets valid user credentials from storage.
+
+    If nothing has been stored, or if the stored credentials are invalid,
+    the OAuth2 flow is completed to obtain the new credentials.
+
+    Returns:
+        Credentials, the obtained credential.
+    """
+    home_dir = os.path.expanduser('~')
+    credential_dir = os.path.join(home_dir, '.credentials')
+    if not os.path.exists(credential_dir):
+        os.makedirs(credential_dir)
+    credential_path = os.path.join(credential_dir,
+                                   'calendar-python-insert.json')
+
+    store = Storage(credential_path)
+    credentials = store.get()
+    if not credentials or credentials.invalid:
+        flow = client.flow_from_clientsecrets(CLIENT_SECRET_FILE, SCOPES)
+        flow.user_agent = APPLICATION_NAME
+        if flags:
+            credentials = tools.run_flow(flow, store, flags)
+        else: # Needed only for compatibility with Python 2.6
+            credentials = tools.run(flow, store)
+        print('Storing credentials to ' + credential_path)
+    return credentials
+
 def check(num):
     """Shows basic usage of the Google Calendar API.
 
@@ -67,7 +95,7 @@ def check(num):
     # service = discovery.build('calendar', 'v3', http=credentials.authorize(Http()))
 
     now = datetime.datetime.utcnow().isoformat() + 'Z' # 'Z' indicates UTC time
-    print('Getting the upcoming 10 events')
+    # print('Getting the upcoming 10 events')
     x = '接下來的' + num + '個活動：\n'
 
     eventsResult = service.events().list(
@@ -105,7 +133,7 @@ class TocMachine(GraphMachine):
 
     def a_to_c(self, update):
         text = update.message.text
-        return text == 'A go to C'
+        return text == 'dinner'
 
     def b_to_d(self, update):
         text = update.message.text
@@ -132,9 +160,35 @@ class TocMachine(GraphMachine):
 
     def on_enter_state3(self, update):
         update.message.reply_text("state C here")
+        credentials = get_credentials_insert()
+        http = credentials.authorize(httplib2.Http())
+        service = discovery.build('calendar', 'v3', http=http)
+
+        # GMT_OFF = '08:00'
+        EVENT = {
+            'summary':'哭QQ',
+            'start': {
+                'date': '2018-01-03'
+            },
+            'end': {
+                'date': '2018-01-03'
+            },
+            'attendees': [
+                {'email': 'hoiian96@gmail.com'}
+            ]
+        }
+
+        e = service.events().insert(calendarId='primary', body=EVENT).execute()
+
+        if(e):
+            update.message.reply_text("updated!")
 
     def on_enter_state4(self, update):
         global num
         update.message.reply_text("state D here")
-        update.message.reply_text(check(num))
+        if (check(num)):
+            update.message.reply_text(check(num))
+        else:
+            update.message.reply_text("sth wrong.")
+        
         # update.message.reply_text(num)

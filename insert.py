@@ -21,8 +21,8 @@ except ImportError:
 # If modifying these scopes, delete your previously saved credentials
 # at ~/.credentials/calendar-python-quickstart.json
 SCOPES = 'https://www.googleapis.com/auth/calendar'
-CLIENT_SECRET_FILE = 'client_secret_165964366033-k8fv1glia0lfsqn120k6h32u26cofcba.apps.googleusercontent.com.json'
-APPLICATION_NAME = 'Google Calendar API Python Quickstart'
+CLIENT_SECRET_FILE = 'client_secret.json'
+APPLICATION_NAME = 'my-telegram'
 
 
 def get_credentials():
@@ -79,11 +79,15 @@ def main():
 
     # print("hihihi")
 
-    GMT_OFF = '08:00'
+    # GMT_OFF = '08:00'
     EVENT = {
-        'summary':'dinner with yy',
-        'start' : {'dateTime': '2017-12-31T19:00:00%s' % GMT_OFF},
-        'end' : {'dateTime': '2017-12-31T20:00:00%s' % GMT_OFF},
+        'summary':'哭',
+        'start': {
+            'date': '2018-01-03'
+        },
+        'end': {
+            'date': '2018-01-03'
+        },
         'attendees': [
             {'email': 'hoiian96@gmail.com'}
         ]
