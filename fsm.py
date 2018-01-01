@@ -182,7 +182,9 @@ class TocMachine(GraphMachine):
 
     def on_enter_state3(self, update):
         global the_date
-        update.message.reply_text(the_date + "你要幹嘛呢？")
+        m = the_date[0:2]
+        d = the_date[3:5]
+        update.message.reply_text(m + '月' + d + '日' + "你要幹嘛呢？")
         # update.message.reply_text(the_date)
 
     def on_enter_state5(self, update):
