@@ -6,16 +6,20 @@ import telegram
 from flask import Flask, request, send_file
 
 from fsm import TocMachine
-
+from telegram.ext import Updater, CommandHandler, MessageHandler
 
 API_TOKEN = '489589959:AAFUyzPE9CwU-1AyetlpZUfL0kgnv4OsGQo'
 WEBHOOK_URL = 'https://4e9b7949.ngrok.io/hook'
 
 app = Flask(__name__)
 bot = telegram.Bot(token=API_TOKEN)
+updater = Updater(token=API_TOKEN)
+dispatcher = updater.dispatcher
+
 machine = TocMachine(
     states=[
-        'user',
+        'initial',
+        'state0',
         'state1',
         'state2',
         'state3',
@@ -27,7 +31,7 @@ machine = TocMachine(
         {
             'trigger': 'advance',
             'source': [
-                'user',
+                'state0',
                 'state2',
                 'state4',
                 'state5'
@@ -38,7 +42,7 @@ machine = TocMachine(
         {
             'trigger': 'advance',
             'source': [
-                'user',
+                'state0',
                 'state1',
                 'state3',
                 'state4',
@@ -50,7 +54,7 @@ machine = TocMachine(
         # {
         #     'trigger': 'advance',
         #     'source': [
-        #         'user',
+        #         'state0',
         #         'state2',
         #         'state4',
         #         'state5'
@@ -64,7 +68,7 @@ machine = TocMachine(
                 'state1',
                 'state2'
             ],
-            'dest': 'user'
+            'dest': 'state0'
         },
         {
             'trigger':'advance',
@@ -83,9 +87,23 @@ machine = TocMachine(
             'source': 'state2',
             'dest': 'state4',
             'conditions': 'b_to_d'
+        },
+        {
+            'trigger':'advance',
+            'source': [
+                'initial',
+                'state0',
+                'state1',
+                'state2',
+                'state3',
+                'state4',
+                'state5'
+            ],
+            'dest': 'state0',
+            'conditions': 'welcome'
         }
     ],
-    initial='user',
+    initial='initial',
     auto_transitions=False,
     show_conditions=True,
 )
@@ -104,7 +122,7 @@ def webhook_handler():
     # if request.method == "POST":
     update = telegram.Update.de_json(request.get_json(force=True), bot)
     # bot.send_message(chat_id=bot.chat_id,text=":)")
-    machine.advance(update)
+    machine.advance(update)    
     return 'ok'
 
 
@@ -121,7 +139,20 @@ def show_fsm():
 #                  ("Hi there, I am EchoBot.\n"
 #                   "I am here to echo your kind words back to you."))
 
+# def start(bot, update):
+#     update.message.reply_text("Welcome to my awesome bot!")
+
+# @command(CommandHandler,'start')
+# def start(bot, update):
+#     bot.sendMessage(chat_id=update.message.chat_id, text="I'm a bot, please talk to me!")
+
+# def start():
+#     update = telegram.Update.de_json(request.get_json(force=True), bot)
+#     bot.sendMessage(chat_id=update.message.chat_id, text="I'm a bot, please talk to me!")
+
 if __name__ == "__main__":
     _set_webhook()
     app.run()
-    # bot.polling()
+
+    # start_handler = CommandHandler('start',start)
+    # dispatcher.add_handler(start_handler)

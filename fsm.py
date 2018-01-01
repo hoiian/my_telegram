@@ -124,13 +124,19 @@ class TocMachine(GraphMachine):
             **machine_configs
         )
 
+    def welcome(self, update):
+        text = update.message.text
+        # if (text == 'hi' or text == '/start' or text == '/help' or text == '嗨' or text == '?' or text == 'hihi'):
+        return True
+
+
     def to_a(self, update):
         text = update.message.text
-        return text == '加行程'
+        return '加' in text or 'add' in text
 
     def to_b(self, update):
         text = update.message.text
-        return text == '查行程'
+        return '查' in text or 'check' in text
 
     def to_f(self, update):
         text = update.message.text
@@ -158,7 +164,7 @@ class TocMachine(GraphMachine):
         return num.isdigit()
     
     def on_enter_state1(self, update):
-        update.message.reply_text("什麼時候呢？(yyyy-mm-dd)")
+        update.message.reply_text("什麼時候呢？(mm-dd)")
         update.message.reply_photo(open('test.gif', 'rb'))
         # self.go_back(update)
 
@@ -181,7 +187,7 @@ class TocMachine(GraphMachine):
 
     def on_enter_state5(self, update):
         global title
-        update.message.reply_text("state5 here")
+        # update.message.reply_text("state5 here")
 
         credentials = get_credentials_insert()
         http = credentials.authorize(httplib2.Http())
@@ -190,10 +196,10 @@ class TocMachine(GraphMachine):
         EVENT = {
             'summary':title,
             'start': {
-                'dateTime': the_date + 'T09:00:00+08:00'
+                'dateTime': '2018-' + the_date + 'T09:00:00+08:00'
             },
             'end': {
-                'dateTime': the_date + 'T10:00:00+08:00'
+                'dateTime': '2018-' + the_date + 'T10:00:00+08:00'
             }
         }
 
@@ -205,7 +211,7 @@ class TocMachine(GraphMachine):
 
     def on_enter_state4(self, update):
         global num
-        update.message.reply_text("state D here")
+        # update.message.reply_text("state D here")
         if (check(num)):
             update.message.reply_text(check(num))
         else:
@@ -214,3 +220,6 @@ class TocMachine(GraphMachine):
     # def on_enter_state6(self, update):
     #     update.message.reply_text("state F here")
     #     delete('睡覺')
+
+    def on_enter_state0(self, update):
+        update.message.reply_text("你要「加行程」還是「查行程」？")
