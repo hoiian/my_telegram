@@ -24,7 +24,7 @@ python3 app.py
 ```
 
 ## Finite State Machine
-![fsm](./explanation.jpg)
+![fsm](./show-fsm.png)
 
 ## Usage
 The initial state is set to `initial`.
@@ -41,6 +41,8 @@ The initial state is set to `initial`.
 	* Input: santence included "check" or "查"
 		* Reply: "想查接下來幾個活動？"
 		* ........
++ More details
+![explanation](./explanation.jpg)
 
 ## Author
 [hoiian](https://github.com/hoiian)
