@@ -24,7 +24,7 @@ python3 app.py
 ```
 
 ## Finite State Machine
-![fsm](./img/show-fsm.png)
+![fsm](./explanation.jpg)
 
 ## Usage
 The initial state is set to `initial`.
