@@ -14,7 +14,7 @@ pip install -r requirements.txt
 
 ### Run Locally
 
-*`ngrok` 
++ ngrok
 
 
 #### Run the sever
